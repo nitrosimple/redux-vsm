@@ -1,6 +1,6 @@
 {
   "name": "redux-vsm",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Visual State Management (Redux)",
   "main": "lib/index.js",
   "scripts": {
@@ -13,12 +13,17 @@
     "type": "git",
     "url": "git+https://github.com/nitrosimple/redux-vsm.git"
   },
+  "files": [
+    "lib",
+    "src"
+  ],
   "keywords": [
     "redux",
     "visual",
     "state",
     "reducers",
-    "actions"
+    "actions",
+    "dispatch"
   ],
   "author": "Roman Kuterev <nitrosimple@gmail.com>",
   "license": "MIT",
@@ -34,9 +39,6 @@
     "babel-preset-stage-1": "^6.24.1",
     "babel-preset-stage-3": "^6.24.1",
     "babel-register": "^6.24.1",
-    "rimraf": "^2.5.3"
-  },
-  "dependencies": {
     "rimraf": "^2.6.1"
   }
 }
