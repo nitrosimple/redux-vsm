@@ -1,11 +1,12 @@
 import {storeWrapper, getParams, setReducerFuncs} from './buildReducer.js'
-import {setSyncActions, callSync, send, setFetching} from './buildSyncAction.js'
+import {setSyncActions, callSync, send, setFetching, setStore} from './buildSyncAction.js'
 import {setAsyncActions, callAsync, ajax} from './buildAsyncAction.js'
 
 const initialize = (data) => {
 	setReducerFuncs(data.reducerFuncs)
 	setSyncActions(data.syncActions)
-	setAsyncActions(data.asyncActions)
+	setAsyncActions(data.asyncActions),
+	setStore(data.store)
 }
 
 export {

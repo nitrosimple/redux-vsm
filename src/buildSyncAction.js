@@ -1,12 +1,15 @@
-import store from '../index'
 import {splitPath} from '../utils/index'
+
+let store
+export const setStore = (s) => {
+	store = s
+}
 
 let syncActions = {}
 export const setSyncActions = (actions) => {
 	syncActions = actions
 }
 
-// old: action
 export const callSync = (type, cr, params) => {
 	const fn = syncActions[type]
 	return fn ?
@@ -37,7 +40,6 @@ const showError = {
 	}
 }
 
-// old: vsmAction
 export const send = (type = ``, cr = ``, path = ``, params = {}) => {
 	let buildAction = {}
 
@@ -49,13 +51,10 @@ export const send = (type = ``, cr = ``, path = ``, params = {}) => {
 	}
 	else {
 		const {reducer, branch, method} = splitPath(path)
-
-		// Полный путь, к примеру: extend:table.settings выводится для удобства
 		buildAction.path = path
 		buildAction.reducer = reducer
 		buildAction.branch = branch
 		buildAction.method = method
-		// buildAction = Object.assign({}, buildAction, splitPath(path))
 	}
 
 	params === {} ? showError.params(params) :
@@ -68,7 +67,6 @@ export const setFetching = (branch, status) => {
 	const type = status === true ?
 		`Начало загрузки ${branch}...` :
 		`Завершение загрузки ${branch}...`
-
 	send(type, `global`,
 		`extend:${branch}`, {data: {fetching: status}}
 	)

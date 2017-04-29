@@ -1,12 +1,12 @@
 {
   "name": "redux-vsm",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Visual State Management (Redux)",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rimraf lib",
-    "build": "npm run clean && babel src --out-dir lib --ignore *.specs.js",
+    "build": "npm run clean && babel src --out-dir lib",
     "prepublish": "npm run build"
   },
   "repository": {
