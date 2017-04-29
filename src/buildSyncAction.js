@@ -1,4 +1,4 @@
-import {splitPath} from '../utils/index'
+import {splitPath} from './utils/index'
 
 let store
 export const setStore = (s) => {
