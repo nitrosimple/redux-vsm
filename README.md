@@ -14,6 +14,7 @@ send('Обновление пользователей', cr,
   }
 )
 ```
+Функция `send` - одно и тоже что и store.dispatch в redux, но немного расширяемая.
 
 **Параметры:**
 - `type` - тип экшена, который вызывается
@@ -32,4 +33,43 @@ send('Обновление счетчика', cr,
     }
   }
 )
+```
+
+**Пример асинхронных actions:**
+```js
+export const asyncActions = {
+  'Getting tickets': async (type, cr) => {
+	 setFetching(`tickets.action`, true)
+    const json = await ajax.get(`/api/v1/tickets`)
+
+	 send(type, cr,
+      `extend:tickets`, {
+        data: {
+          data: {
+            items: json,
+            count: json.length
+          },
+          action: {fetching: false}
+        }
+      }
+    )
+
+  },
+  'Getting users': async (type, cr) => {
+	 setFetching(`users.action`, true)
+    const json = await ajax.get(`/api/v1/users`)
+
+	 send(type, cr,
+      `extend:users`, {
+        data: {
+          data: {
+            users: json,
+          },
+          action: {fetching: false}
+        }
+      }
+    )
+
+  }
+}
 ```
