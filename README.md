@@ -6,12 +6,12 @@
 **Пример экшена:**
 ```js
 send('Обновление пользователей', cr,
-	`extend:users.engineers`, {
-		data: {
-			items: [{name: `Tom`, age: 25}, {name: `Jane`, age: 26}],
-			count: 2
-		}
-	}
+  `extend:users.engineers`, {
+    data: {
+      items: [{name: `Tom`, age: 25}, {name: `Jane`, age: 26}],
+        count: 2
+    }
+  }
 )
 ```
 
@@ -26,10 +26,10 @@ send('Обновление пользователей', cr,
 Так как функция `extend` является универсальной - то можно её применить в любом state приложения:
 ```js
 send('Обновление счетчика', cr,
-	`extend:app.data`, {
-		data: {
-			count: 123
-		}
-	}
+  `extend:app.data`, {
+    data: {
+      count: 123
+    }
+  }
 )
 ```
