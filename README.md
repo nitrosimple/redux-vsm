@@ -40,10 +40,27 @@ send('Обновление счетчика', cr,
 
 В контейнере можно произвести вызов экшена '*Обновление счетчика*':
 ```js
-callSync(`Обновление счетчика`, cr)
+callSync(`Обновление счетчика`, cr, {count: 123})
 ```
-`callSync` найдет данный type action-а и произведет выполнение нужного кода.
+`callSync` найдет данный type action-а и произведет выполнение нужного кода, который показан ниже.
 
+<br />
+
+**Пример синхронных actions:**
+```js
+export const syncActions = {
+  'Обновление счетчика': (type, cr, params) => {
+    send('Обновление счетчика', cr,
+      `extend:app.data`, {
+        data: {
+          count: params.count
+        }
+      }
+    )
+  },
+  `etc...`
+}
+```
 <br />
 
 **Пример асинхронных actions:**
@@ -96,6 +113,6 @@ export const reducerFuncs = {
 
     return state
   },
-  etc...
+  `etc...`
 }
 ```
