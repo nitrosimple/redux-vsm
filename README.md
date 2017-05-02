@@ -14,7 +14,29 @@ send('Обновление пользователей', cr,
   }
 )
 ```
-Функция `send` - одно и тоже что и store.dispatch в redux, но немного расширяемая.
+
+## Настройка
+```js
+import {initialize} from 'redux-vsm'
+import {syncActions} from './actions/sync'
+import {asyncActions} from './actions/async'
+import {reducerFuncs} from './reducers/reducerFuncs'
+
+initialize({
+	syncActions, // your sync actions
+	asyncActions, // your async actions
+	reducerFuncs, // universal reducer functions
+	store // your redux store
+})
+```
+Откуда берутся syncActions и asyncActions мы рассмотрим ниже.
+
+<br />
+
+## Начало работы с redux-vsm
+
+Функция `send` использует функцию **store.dispatch**, которая есть в redux.
+Отличие в том, что `send` немного расширяемая.
 
 **Параметры:**
 - `type` - тип экшена, который вызывается
