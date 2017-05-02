@@ -1,25 +1,27 @@
-// Разделение редюсера и ветки
+/**
+ * splitPath - Разделение пути, к примеру, extend:tickets.actions.settings
+ * на функцию, редюсер и ветку. В данном случае функция - это extend,
+ * редюсер/state - tickets, branch - actions.settings
+ * @param {string} fullPath - инструкция/путь
+ * @return {object} - Объект с разделениями
+ */
 export const splitPath = (fullPath) => {
 	let params = {
-		method: false,
+		func: false,
 		reducer: false,
 		branch: false
 	}
-
 	if (fullPath.match(/\:/)) {
-		let method = fullPath.split(`:`)[0]
+		let func = fullPath.split(`:`)[0]
 		let path = fullPath.split(`:`)[1]
-
-		params.method = method.length > 0 ?
-			method :	false
+		params.func = func.length > 0 ?
+			func :	false
 
 		if (path.match(/\./)) {
 			if (path.indexOf(`.`) > 0) {
 				let arr = path.split(`.`)
-
 				params.reducer = arr[0].length > 0 ?
 					path.substr(0, path.indexOf(`.`)) : false
-
 				params.branch = arr[1].length > 0 ?
 					path.substr(path.indexOf(`.`) + 1) : false
 			}
@@ -32,4 +34,13 @@ export const splitPath = (fullPath) => {
 		}
 	}
 	return params
+}
+
+/**
+ * splitPath - Глубокое клонирование объекта
+ * @param {object} obj - объект, который нужно клонировать
+ * @return {object} - Клонированный объект
+ */
+export const cloneDeep = (obj) => {
+	return JSON.parse(JSON.stringify(obj))
 }

@@ -1,6 +1,6 @@
 {
   "name": "redux-vsm",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Visual State Management (Redux)",
   "main": "lib/index.js",
   "scripts": {
@@ -40,5 +40,9 @@
     "babel-preset-stage-3": "^6.24.1",
     "babel-register": "^6.24.1",
     "rimraf": "^2.6.1"
+  },
+  "dependencies": {
+    "lodash.get": "^4.4.2",
+    "query-string": "^4.3.4"
   }
 }
