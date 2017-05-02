@@ -72,6 +72,7 @@ export const asyncActions = {
   }
 }
 ```
+<br />
 
 **Пример универсальной функции extend:**
 ```js
