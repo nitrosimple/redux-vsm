@@ -39,10 +39,10 @@ send('Обновление счетчика', cr,
 ```js
 export const asyncActions = {
   'Getting tickets': async (type, cr) => {
-	 setFetching(`tickets.action`, true)
+    setFetching(`tickets.action`, true)
     const json = await ajax.get(`/api/v1/tickets`)
 
-	 send(type, cr,
+    send(type, cr,
       `extend:tickets`, {
         data: {
           data: {
@@ -56,10 +56,10 @@ export const asyncActions = {
 
   },
   'Getting users': async (type, cr) => {
-	 setFetching(`users.action`, true)
+    setFetching(`users.action`, true)
     const json = await ajax.get(`/api/v1/users`)
 
-	 send(type, cr,
+    send(type, cr,
       `extend:users`, {
         data: {
           data: {
