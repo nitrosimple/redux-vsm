@@ -24,10 +24,10 @@ import {asyncActions} from './actions/async'
 import {reducerFuncs} from './reducers/reducerFuncs'
 
 initialize({
-	syncActions, // your sync actions
-	asyncActions, // your async actions
-	reducerFuncs, // universal reducer functions
-	store // your redux store
+  syncActions, // your sync actions
+  asyncActions, // your async actions
+  reducerFuncs, // universal reducer functions
+  store // your redux store
 })
 ```
 Откуда берутся syncActions и asyncActions мы рассмотрим ниже.
