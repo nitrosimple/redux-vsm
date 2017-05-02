@@ -53,7 +53,6 @@ export const asyncActions = {
         }
       }
     )
-
   },
   'Getting users': async (type, cr) => {
     setFetching(`users.action`, true)
@@ -69,7 +68,22 @@ export const asyncActions = {
         }
       }
     )
-
   }
+}
+```
+
+**Пример универсальной функции extend:**
+```js
+export const reducerFuncs = {
+  extend: (state, action) => {
+    const {branch, branchData, params} = getParams(state, action)
+
+    state = branch ?
+      set(state, branch, deepExtend(branchData, params.data)) :
+      deepExtend(branchData, params.data)
+
+    return state
+  },
+  etc...
 }
 ```
