@@ -37,16 +37,21 @@ const commonParams = {
 
 /**
  * checkStatus - Проверка (выводится ли ответ от сервера при запросе)
- * Если ответа от сервера нет - то произойдет запись в state app.errors
+ * Если ответа от сервера нет - то произойдет запись в state app.error
  * @param {object} response - Ответ от сервера
  * @return {any} - Ошибка или ответ от сервера
  */
+
 function checkStatus(response) {
 	if (!response.ok) {
-		// response.statusText
-		// response.url
 		send(`Ошибка Ajax запроса`, `global`,
-			`extend:app.errors`, {data: {page: 404}}
+			`extend:app.error`, {
+				data: {
+					status: response.status,
+					url: response.url,
+					message: response.statusText
+				}
+			}
 		)
 		let error = new Error(response.statusText)
 		error.response = response
