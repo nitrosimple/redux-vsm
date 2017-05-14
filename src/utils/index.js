@@ -1,4 +1,15 @@
 /**
+ * isAO - Объект или массив
+ * @param {any} entity - передаваемая сущность
+ * @return {string} - array/object/other
+ */
+const isAO = (entity) => {
+	const type = Object.prototype.toString.call(entity)
+	return type === '[object Array]' ? 'array' :
+		type === '[object Object]' ? 'object' : 'other'
+}
+
+/**
  * splitPath - Разделение пути, к примеру, extend:tickets.actions.settings
  * на функцию, редюсер и ветку. В данном случае функция - это extend,
  * редюсер/state - tickets, branch - actions.settings
@@ -43,4 +54,23 @@ export const splitPath = (fullPath) => {
  */
 export const cloneDeep = (obj) => {
 	return JSON.parse(JSON.stringify(obj))
+}
+
+/**
+ * isJson - Проверка, что передаваемые данные - JSON объект
+ * @param {string} str - строка данных
+ * @return {boolean}
+ */
+export const isJson = (str) => {
+	try {
+		if(JSON.parse(str) instanceof Array ||
+			JSON.parse(str) instanceof Object) {
+			return true
+		}
+		else {
+			return false
+		}
+	} catch (e) {
+		return false
+	}
 }

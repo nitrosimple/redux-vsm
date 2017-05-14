@@ -1,6 +1,8 @@
 import queryString from 'query-string'
+import {isJson, isAO} from './utils/index'
 import {send} from './buildSyncAction'
 let asyncActions = {}
+let currentUrl
 
 /**
  * setAsyncActions - устанавливает асинхронныые actions (из внешнего приложения)
@@ -36,28 +38,32 @@ const commonParams = {
 }
 
 /**
+ * sendAjaxError - Ошибка ajax запроса (обновление state)
+ * @param {string} message - Сообщение об ошибке
+ * @param {string} status - Статус ответа сервера
+ * @param {string} url - URL, к которому идет запрос
+ */
+const sendError = (message, status, url) => {
+	send(`Ошибка при получении данных с сервера`, `global`,
+		`extend:app.error`, {
+			data: {message, status, url}
+		}
+	)
+}
+
+/**
  * checkStatus - Проверка (выводится ли ответ от сервера при запросе)
  * Если ответа от сервера нет - то произойдет запись в state app.error
  * @param {object} response - Ответ от сервера
  * @return {any} - Ошибка или ответ от сервера
  */
-
 function checkStatus(response) {
 	if (!response.ok) {
-		send(`Ошибка Ajax запроса`, `global`,
-			`extend:app.error`, {
-				data: {
-					status: response.status,
-					url: response.url,
-					message: response.statusText
-				}
-			}
-		)
-		let error = new Error(response.statusText)
-		error.response = response
-		throw error
+		sendError(response.statusText, response.status, response.url)
+		throw new Error(response)
 	}
 	else {
+		currentUrl = response.url
 		return response
 	}
 }
@@ -72,7 +78,16 @@ const fetchData = (url, params) => {
 	return new Promise((resolve, reject) => {
 		fetch(url, params)
 			.then(checkStatus)
-			.then(res => resolve(res.json()))
+			.then(res => res.text())
+			.then(data => {
+				if (isJson(data)) {
+					return resolve(JSON.parse(data))
+				}
+				else {
+					sendError(`Invalidate JSON`, 200, currentUrl)
+					throw new Error(`Invalidate JSON`)
+				}
+			})
 			.catch(err => reject(err))
 	})
 }
