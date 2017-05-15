@@ -78,16 +78,16 @@ const fetchData = (url, params) => {
 	return new Promise((resolve, reject) => {
 		fetch(url, params)
 			.then(checkStatus)
-			.then(res => res.text())
-			.then(data => {
-				if (isJson(data)) {
-					return resolve(JSON.parse(data))
-				}
-				else {
-					sendError(`Invalidate JSON`, 200, currentUrl)
-					throw new Error(`Invalidate JSON`)
-				}
-			})
+			.then(res => resolve(res.json()))
+			// .then(data => {
+			// 	if (isJson(data)) {
+			// 		return resolve(JSON.parse(data))
+			// 	}
+			// 	else {
+			// 		sendError(`Invalidate JSON`, 200, currentUrl)
+			// 		throw new Error(`Invalidate JSON`)
+			// 	}
+			// })
 			.catch(err => reject(err))
 	})
 }
