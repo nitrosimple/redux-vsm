@@ -43,12 +43,29 @@ const commonParams = {
  * @param {string} status - Статус ответа сервера
  * @param {string} url - URL, к которому идет запрос
  */
-const sendError = (message, status, url) => {
+const sendError = (message, status, url, text) => {
 	send(`Ошибка при получении данных с сервера`, `global`,
 		`extend:app.error`, {
-			data: {message, status, url}
+			data: {message, status, url, text: JSON.stringify(text)}
 		}
 	)
+}
+
+/**
+ * setBody - Проверка является ли текущий ответ(body) JSON или просто текст
+ * @param {any} data - Body от сервера
+ * @return {any} - Ошибка или ответ от сервера
+ */
+const setBody = (data) => {
+	if (!data) {
+		return ``
+	}
+	if (isJson(data)) {
+		return JSON.parse(data)
+	}
+	else {
+		return data
+	}
 }
 
 /**
@@ -59,8 +76,8 @@ const sendError = (message, status, url) => {
  */
 function checkStatus(response) {
 	if (!response.ok) {
-		sendError(response.statusText, response.status, response.url)
-		throw new Error(response)
+		sendError(response.statusText, response.status, response.url, response.body)
+		throw new Error(response.body)
 	}
 	else {
 		currentUrl = response.url
@@ -76,9 +93,22 @@ function checkStatus(response) {
  */
 const fetchData = (url, params) => {
 	return new Promise((resolve, reject) => {
+		let resp = {}
 		fetch(url, params)
-			.then(checkStatus)
-			.then(res => resolve(res.json()))
+			.then(res => {
+				resp = {
+					statusText: res.statusText,
+					status: res.status,
+					url: res.url,
+					ok: res.ok
+				}
+				return res.text()
+			})
+			.then(body => {
+				resp.body = setBody(body)
+				return checkStatus(resp)
+			})
+			.then(res => resolve({body: res.body, status: res.status}))
 			// .then(data => {
 			// 	if (isJson(data)) {
 			// 		return resolve(JSON.parse(data))
