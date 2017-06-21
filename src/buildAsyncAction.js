@@ -92,6 +92,10 @@ function checkStatus(response) {
  * @return {promise} - Promise (в данном случае для async/await функций)
  */
 const fetchData = (url, params) => {
+	// Блокировка окна когда идет загрузка
+	let blockEl = document.getElementById('block-all')
+	if (blockEl !== null) blockEl.className = 'block-all'
+
 	return new Promise((resolve, reject) => {
 		let resp = {}
 		fetch(url, params)
@@ -108,16 +112,11 @@ const fetchData = (url, params) => {
 				resp.body = setBody(body)
 				return checkStatus(resp)
 			})
-			.then(res => resolve({body: res.body, status: res.status}))
-			// .then(data => {
-			// 	if (isJson(data)) {
-			// 		return resolve(JSON.parse(data))
-			// 	}
-			// 	else {
-			// 		sendError(`Invalidate JSON`, 200, currentUrl)
-			// 		throw new Error(`Invalidate JSON`)
-			// 	}
-			// })
+			.then(res => {
+				// При загрузке данных - разблокировка
+				if (blockEl !== null) blockEl.className='unblock-all'
+				return resolve({body: res.body, status: res.status})
+			})
 			.catch(err => reject(err))
 	})
 }
