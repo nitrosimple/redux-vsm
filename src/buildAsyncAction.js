@@ -85,40 +85,23 @@ const setBody = (data) => {
  * @return {any} - Ошибка или ответ от сервера
  */
 function checkStatus(response, fetchingBranch) {
-	if (!response.ok) {
-		sendError(response.statusText, response.status, response.url, response.body)
-		if (fetchingBranch) setFetching(fetchingBranch, false)
-		throw new Error(response.body)
-	}
-	else {
+	if (response.status === 200 || response.status === 201 || response.status === 204) {
 		currentUrl = response.url
 		return response
 	}
-}
-
-/**
- * timeout - Установка времени ожидания ответа от сервера
- * @param {number} ms - Время ожидания в миллисекундах
- * @param {promise} promise - fetch Promise
- * @return {promise} - Promise
- */
-function timeout(ms, promise) {
-	return new Promise((resolve, reject) => {
-		const timeoutId = setTimeout(() => {
+	else {
+		// Если статус в ожидании - открыть окно с предупреждением
+		if (response.status === 202) {
 			let pendingEl = document.getElementById('pending')
 			if (pendingEl !== null) pendingEl.className = 'show-pending'
-		}, ms)
-		promise.then(
-			(res) => {
-				clearTimeout(timeoutId);
-				resolve(res);
-			},
-			(err) => {
-				clearTimeout(timeoutId);
-				reject(err);
-			}
-		)
-	})
+		}
+		// Если ошибки (40*-50* коды)
+		else {
+			sendError(response.statusText, response.status, response.url, response.body)
+		}
+		if (fetchingBranch) setFetching(fetchingBranch, false)
+		throw new Error(response.body)
+	}
 }
 
 /**
@@ -135,7 +118,7 @@ const fetchData = (url, params, fetchingBranch) => {
 
 	return new Promise((resolve, reject) => {
 		let resp = {}
-		timeout(pendingMs, fetch(url, params))
+		fetch(url, params)
 			.then(res => {
 				resp = {
 					statusText: res.statusText,
@@ -154,7 +137,11 @@ const fetchData = (url, params, fetchingBranch) => {
 				if (blockEl !== null) blockEl.className='unblock-all'
 				return resolve({body: res.body, status: res.status})
 			})
-			.catch(err => reject(err))
+			.catch(err => {
+				// При загрузке данных - разблокировка
+				if (blockEl !== null) blockEl.className='unblock-all'
+				return reject(err)
+			})
 	})
 }
 
