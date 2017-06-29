@@ -1,20 +1,22 @@
 /* redux-vsm - index.js */
 import {storeWrapper, getParams, setReducerFuncs} from './buildReducer.js'
 import {setSyncActions, callSync, send, setFetching, setStore} from './buildSyncAction.js'
-import {setAsyncActions, callAsync, ajax} from './buildAsyncAction.js'
+import {setPendingTimeout, setAsyncActions, callAsync, ajax} from './buildAsyncAction.js'
 
 /**
  * initialize - Устанавливает функции для универсальных редюсеров,
- * синхронные и асинхронные actions и store, которые используются
- * во внешнем приложении
+ * синхронные и асинхронные actions и store, время ожидания сервера,
+ * которые используются во внешнем приложении
  *
  * @param data - объект
+ * 	@data.pendingTime
  * 	@data.reducerFuncs
  * 	@data.syncActions
  * 	@data.asyncActions
  * 	@data.store
 */
 const initialize = (data) => {
+	setPendingTimeout(data.pendingTime)
 	setReducerFuncs(data.reducerFuncs)
 	setSyncActions(data.syncActions)
 	setAsyncActions(data.asyncActions),

@@ -1,8 +1,17 @@
 import queryString from 'query-string'
 import {isJson, isAO} from './utils/index'
-import {send} from './buildSyncAction'
+import {send, setFetching} from './buildSyncAction'
 let asyncActions = {}
+let pendingMs = 15000
 let currentUrl
+
+/**
+ * setPendingTimeout - устанавливает время ожидания обращения к серверу в ms (1000 = 1 сек)
+ * @param {object} ms - объект из функций (асинхронные actions)
+ */
+export const setPendingTimeout = (ms) => {
+	pendingMs = ms
+}
 
 /**
  * setAsyncActions - устанавливает асинхронныые actions (из внешнего приложения)
@@ -44,9 +53,10 @@ const commonParams = {
  * @param {string} url - URL, к которому идет запрос
  */
 const sendError = (message, status, url, text) => {
+	let setText = text.hasOwnProperty(`message`) ? text.message : JSON.stringify(text)
 	send(`Ошибка при получении данных с сервера`, `global`,
 		`extend:app.error`, {
-			data: {message, status, url, text: JSON.stringify(text)}
+			data: {message, status, url, text: setText}
 		}
 	)
 }
@@ -74,9 +84,10 @@ const setBody = (data) => {
  * @param {object} response - Ответ от сервера
  * @return {any} - Ошибка или ответ от сервера
  */
-function checkStatus(response) {
+function checkStatus(response, fetchingBranch) {
 	if (!response.ok) {
 		sendError(response.statusText, response.status, response.url, response.body)
+		if (fetchingBranch) setFetching(fetchingBranch, false)
 		throw new Error(response.body)
 	}
 	else {
@@ -86,19 +97,45 @@ function checkStatus(response) {
 }
 
 /**
+ * timeout - Установка времени ожидания ответа от сервера
+ * @param {number} ms - Время ожидания в миллисекундах
+ * @param {promise} promise - fetch Promise
+ * @return {promise} - Promise
+ */
+function timeout(ms, promise) {
+	return new Promise((resolve, reject) => {
+		const timeoutId = setTimeout(() => {
+			let pendingEl = document.getElementById('pending')
+			if (pendingEl !== null) pendingEl.className = 'show-pending'
+		}, ms)
+		promise.then(
+			(res) => {
+				clearTimeout(timeoutId);
+				resolve(res);
+			},
+			(err) => {
+				clearTimeout(timeoutId);
+				reject(err);
+			}
+		)
+	})
+}
+
+/**
  * fetchData - Запрос на получение данных от сервера
  * @param {string} url - URL
  * @param {object} params - Настройки для header-а
  * @return {promise} - Promise (в данном случае для async/await функций)
  */
-const fetchData = (url, params) => {
+const fetchData = (url, params, fetchingBranch) => {
 	// Блокировка окна когда идет загрузка
 	let blockEl = document.getElementById('block-all')
 	if (blockEl !== null) blockEl.className = 'block-all'
+	if (fetchingBranch) setFetching(fetchingBranch, true)
 
 	return new Promise((resolve, reject) => {
 		let resp = {}
-		fetch(url, params)
+		timeout(pendingMs, fetch(url, params))
 			.then(res => {
 				resp = {
 					statusText: res.statusText,
@@ -110,7 +147,7 @@ const fetchData = (url, params) => {
 			})
 			.then(body => {
 				resp.body = setBody(body)
-				return checkStatus(resp)
+				return checkStatus(resp, fetchingBranch)
 			})
 			.then(res => {
 				// При загрузке данных - разблокировка
@@ -128,38 +165,53 @@ const fetchData = (url, params) => {
  * @return {string} - Преобразованная строка
  */
 const combineQueryString = (url, params) => {
-	return params !== undefined ?
-		`${url}?${queryString.stringify(params)}` : url
+	return params ? `${url}?${queryString.stringify(params)}` : url
+}
+
+/* Получение объекта с данными: url, params, fetchingBranch */
+const getReqParams = (reqObj) => {
+	let url, params, fetchingBranch
+	url = (reqObj.hasOwnProperty('url')) ? reqObj.url : null
+	if (url === null) console.log(`VSM: Не был передан обязательный параметр url`)
+
+	params = (reqObj.hasOwnProperty('params')) ? reqObj.params : null
+	fetchingBranch = (reqObj.hasOwnProperty('fetchingBranch')) ? reqObj.fetchingBranch : null
+
+	return {url, params, fetchingBranch}
 }
 
 /* Функции: ajax.get, ajax.post, ajax.put и ajax.delete */
 export const ajax = {
-	get: (url, params) => {
+	get: (reqObj) => {
+		const {url, params, fetchingBranch} = getReqParams(reqObj)
 		const headerGet = Object.assign({}, commonParams,
 			{method: `get`}
 		)
 		const buildUrl = combineQueryString(url, params)
-		return fetchData(buildUrl, headerGet)
+		return fetchData(buildUrl, headerGet, fetchingBranch)
 	},
-	post: (url, params) => {
+	post: (reqObj) => {
+		const {url, params, fetchingBranch} = getReqParams(reqObj)
 		const headerPost = Object.assign({}, commonParams, {
 			method: `post`,
 			body: JSON.stringify(params)
 		})
-		return fetchData(url, headerPost)
+		return fetchData(url, headerPost, fetchingBranch)
 	},
-	put: (url, params) => {
+	put: (reqObj) => {
+		const {url, params, fetchingBranch} = getReqParams(reqObj)
 		const headerPut = Object.assign({}, commonParams, {
 			method: `put`,
 			body: JSON.stringify(params)
 		})
-		return fetchData(url, headerPut)
+		return fetchData(url, headerPut, fetchingBranch)
 	},
-	delete: (url, params) => {
+	delete: (reqObj) => {
+		const {url, params, fetchingBranch} = getReqParams(reqObj)
 		const headerDelete = Object.assign({}, commonParams,
 			{method: `delete`}
 		)
 		const buildUrl = combineQueryString(url, params)
-		return fetchData(buildUrl, headerDelete)
+		return fetchData(buildUrl, headerDelete, fetchingBranch)
 	}
 }
