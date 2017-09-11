@@ -55,9 +55,7 @@ const commonParams = {
 const sendError = (message, status, url, text) => {
 	let setText = text.hasOwnProperty(`message`) ? text.message : JSON.stringify(text)
 	send(`Ошибка при получении данных с сервера`, `global`,
-		`extend:app.error`, {
-			data: {message, status, url, text: setText}
-		}
+		`extend:app.error`, {message, status, url, text: setText}
 	)
 }
 

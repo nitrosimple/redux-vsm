@@ -75,8 +75,8 @@ const showError = {
  */
 export const send = (type = ``, cr = ``, path = ``, params = {}) => {
 	let buildAction = {}
-	!type ? showError.type(type) : buildAction.type = type
 	!cr ? showError.cr(cr) : buildAction.cr = cr
+	!type ? showError.type(type) : buildAction.type = `${cr}: ${type}`
 
 	if (!path) {
 		showError.path(path)
@@ -104,5 +104,5 @@ export const setFetching = (branch, status) => {
 	const type = status === true ?
 		`Начало загрузки ${branch}...` :
 		`Завершение загрузки ${branch}...`
-	send(type, `global`, `extend:${branch}`, {data: {fetching: status}})
+	send(type, `global`, `extend:${branch}`, {fetching: status})
 }
